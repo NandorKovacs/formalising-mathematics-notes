@@ -25,32 +25,60 @@ and also the following two new tactics:
 variable (P Q R S : Prop)
 
 example : P ↔ P := by
-  sorry
+  rfl
 
 example : (P ↔ Q) → (Q ↔ P) := by
-  sorry
+  intro pq
+  constructor
+  apply pq.mpr
+  apply pq.mp
 
 example : (P ↔ Q) ↔ (Q ↔ P) := by
-  sorry
+  constructor
+  all_goals intro pq; rw [pq]
+
 
 example : (P ↔ Q) → (Q ↔ R) → (P ↔ R) := by
-  sorry
+  intro pq qr
+  rwa [pq]
   -- The pattern `rw` then `assumption` is common enough that it can be abbreviated to `rwa`
 
 example : P ∧ Q ↔ Q ∧ P := by
-  sorry
+  constructor
+  all_goals {
+    intro h
+    exact ⟨h.right, h.left⟩
+  }
 
 example : (P ∧ Q) ∧ R ↔ P ∧ Q ∧ R := by
-  sorry
+  constructor
+  rintro ⟨⟨p,q⟩,r⟩
+  exact ⟨p,q,r⟩
+  rintro ⟨p,q,r⟩
+  exact ⟨⟨p,q⟩,r⟩
+
 
 example : P ↔ P ∧ True := by
-  sorry
+  constructor
+  all_goals intro h
+  trivial
+  exact h.1
 
 example : False ↔ P ∧ False := by
-  sorry
+  constructor
+  intro f
+  trivial
+  intro h
+  exact h.2
 
 example : (P ↔ Q) → (R ↔ S) → (P ∧ R ↔ Q ∧ S) := by
-  sorry
+  intro pq rs
+  rw [pq, rs]
 
 example : ¬(P ↔ ¬P) := by
-  sorry
+  by_cases h : P
+  all_goals
+    by_contra hc
+    have hh := h
+    rewrite [hc] at h
+    contradiction

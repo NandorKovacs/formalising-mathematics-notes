@@ -58,13 +58,22 @@ example : P → ¬¬P := by
   trivial
 
 example : (P → Q) → ¬Q → ¬P := by
-  trivial
+  intro pq q p
+  apply q
+  apply pq
+  exact p
 
 example : ¬¬False → False := by
   trivial
 
 example : ¬¬P → P := by
+  intro nnp
+  by_contra
   trivial
 
 example : (¬Q → ¬P) → P → Q := by
+  intro nqnp p
+  by_cases h:Q
+  exact h
+  apply nqnp at h
   trivial
