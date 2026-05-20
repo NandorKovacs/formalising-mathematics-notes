@@ -33,34 +33,38 @@ and the following tactics may also be useful:
 variable (P Q R : Prop)
 
 example : ¬True → False := by
-  sorry
+  trivial
 
 example : False → ¬True := by
-  sorry
+  trivial
 
 example : ¬False → True := by
-  sorry
+  trivial
 
 example : True → ¬False := by
-  sorry
+  trivial
 
 example : False → ¬P := by
-  sorry
+  intro f
+  contradiction
 
 example : P → ¬P → False := by
-  sorry
+  intro p np
+  contradiction
 
 example : P → ¬¬P := by
-  sorry
+  intro p
+  by_contra
+  trivial
 
 example : (P → Q) → ¬Q → ¬P := by
-  sorry
+  trivial
 
 example : ¬¬False → False := by
-  sorry
+  trivial
 
 example : ¬¬P → P := by
-  sorry
+  trivial
 
 example : (¬Q → ¬P) → P → Q := by
-  sorry
+  trivial
