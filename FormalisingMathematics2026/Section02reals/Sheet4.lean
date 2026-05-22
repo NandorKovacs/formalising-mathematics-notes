@@ -40,7 +40,7 @@ see if you can start beginning to guess what various lemmas should be called.
 
 -/
 
-example (x : ℝ) : |-x| = |x| := by exact?
+example (x : ℝ) : |-x| = |x| := by exact abs_neg x
 -- click where it says "try this" to replace
 -- `exact?` with an "exact" proof
 -- Why do the replacement? Because it's quicker!
@@ -59,7 +59,7 @@ example (x y : ℝ) : |x| < y ↔ -y < x ∧ x < y := by exact?
 example (ε : ℝ) (hε : 0 < ε) : 0 < ε / 2 := by linarith
 
 -- or linarith, or guess the name...
-example (a b x y : ℝ) (h1 : a < x) (h2 : b < y) : a + b < x + y := by linarith
+example (a b x y : ℝ) (h1 : a < x) (h2 : b < y) : a + b < x + y := by exact?
 
 example (ε : ℝ) (hε : 0 < ε) : 0 < ε / 3 := by linarith
 

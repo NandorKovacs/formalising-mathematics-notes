@@ -31,25 +31,96 @@ Good luck!
 /-- If `a(n)` tends to `t` then `37 * a(n)` tends to `37 * t`-/
 theorem tendsTo_thirtyseven_mul (a : ℕ → ℝ) (t : ℝ) (h : TendsTo a t) :
     TendsTo (fun n ↦ 37 * a n) (37 * t) := by
-  sorry
+  rewrite [tendsTo_def] at *
+  intro ε hε
+  specialize h (ε/37) (by linarith)
+  cases' h with B h
+  use B
+  intro n hn
+  specialize h n hn
+  rw [abs_lt] at *
+  constructor <;> linarith
 
 /-- If `a(n)` tends to `t` and `c` is a positive constant then
 `c * a(n)` tends to `c * t`. -/
 theorem tendsTo_pos_const_mul {a : ℕ → ℝ} {t : ℝ} (h : TendsTo a t) {c : ℝ} (hc : 0 < c) :
     TendsTo (fun n ↦ c * a n) (c * t) := by
-  sorry
+  rewrite [tendsTo_def] at *
+
+  intro ε hε
+
+  -- specialize h (ε / c) (div_pos hε hc)
+  have hcc : (0 < ε / c) := by
+    rewrite [<- mul_lt_mul_iff_left₀ hc]
+    rewrite [zero_mul]
+    rewrite [div_mul_cancel₀ ε (ne_of_gt hc)]
+    exact hε
+  specialize h (ε / c) hcc
+
+  cases' h with B h
+  use B
+
+  intro n hn
+  specialize h n hn
+
+  rw [<-mul_sub, abs_mul]
+  rw [abs_of_pos hc]
+  -- exact?
+  -- exact (lt_div_iff₀' hc).mp h
+  rw [div_eq_inv_mul] at h
+  rewrite [mul_comm] at h
+
+  have hh := mul_lt_mul_of_pos_right h hc
+  rewrite (occs := .pos [2]) [mul_comm] at hh
+  rewrite (occs := .pos [3]) [mul_comm] at hh
+  rewrite [mul_inv_cancel_left₀ (ne_of_gt hc)] at hh
+  rw [mul_comm]
+  exact hh
+
 
 /-- If `a(n)` tends to `t` and `c` is a negative constant then
 `c * a(n)` tends to `c * t`. -/
 theorem tendsTo_neg_const_mul {a : ℕ → ℝ} {t : ℝ} (h : TendsTo a t) {c : ℝ} (hc : c < 0) :
     TendsTo (fun n ↦ c * a n) (c * t) := by
-  sorry
+    have hnc : (0 < (-c)) := by linarith
+    have hh := tendsTo_pos_const_mul h hnc
+
+    rewrite [tendsTo_def] at hh ⊢
+
+    intro ε hε
+    specialize hh ε hε
+    cases' hh with B hh
+    use B
+    intro n hn
+    specialize hh n hn
+
+    rw [<-mul_sub] at hh ⊢
+    rw [<-abs_neg, <-neg_one_mul, <-mul_assoc] at hh
+    rw (occs := .pos [2]) [mul_comm] at hh
+    rw [mul_neg_one, neg_neg] at hh
+
+    exact hh
 
 /-- If `a(n)` tends to `t` and `c` is a constant then `c * a(n)` tends
 to `c * t`. -/
 theorem tendsTo_const_mul {a : ℕ → ℝ} {t : ℝ} (c : ℝ) (h : TendsTo a t) :
     TendsTo (fun n ↦ c * a n) (c * t) := by
-  sorry
+  by_cases hc:(c<0)
+  exact tendsTo_neg_const_mul h hc
+  by_cases hcc:(c>0)
+  exact tendsTo_pos_const_mul h hcc
+  have h0 : c=0:= by
+    rw [not_lt] at hc hcc
+    rw [eq_of_ge_of_le hc hcc]
+
+  rewrite [tendsTo_def]
+  intro ε hε
+  use 0
+  intro n hn
+
+  rw [h0, zero_mul, zero_mul, sub_zero]
+  norm_num
+  exact hε
 
 /-- If `a(n)` tends to `t` and `c` is a constant then `a(n) * c` tends
 to `t * c`. -/

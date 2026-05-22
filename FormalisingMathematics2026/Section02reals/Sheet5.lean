@@ -14,16 +14,18 @@ open Section2sheet3solutions
 
 -- you can maybe do this one now
 theorem tendsTo_neg {a : ℕ → ℝ} {t : ℝ} (ha : TendsTo a t) : TendsTo (fun n ↦ -a n) (-t) := by
-  rw [tendsTo_def] at ha ⊢
-  intro ε hε
+  revert ha
+  rw [tendsTo_def, tendsTo_def]
+  intro ha ε hε
   specialize ha ε hε
-  rcases ha with ⟨B, hB⟩
+  cases' ha with B ha
   use B
   intro n hn
-  rw [← abs_neg]
-  ring_nf
-  specialize hB n hn
-  exact hB
+  specialize ha n hn
+  rw [<-abs_sub_comm]
+  simp
+  rw [neg_add_eq_sub]
+  exact ha
 
 /-
 `tendsTo_add` is the next challenge. In a few weeks' time I'll
@@ -39,31 +41,41 @@ of the results we proved in sheet 4 will be helpful.
 tends to `t + u`. -/
 theorem tendsTo_add {a b : ℕ → ℝ} {t u : ℝ} (ha : TendsTo a t) (hb : TendsTo b u) :
     TendsTo (fun n ↦ a n + b n) (t + u) := by
+  -- decompose TendsTo objects to convergence definitions
   rw [tendsTo_def] at *
-  -- let ε > 0 be arbitrary
-  intro ε hε
-  --  There's a bound X such that if n≥X then a(n) is within ε/2 of t
-  specialize ha (ε / 2) (by linarith)
-  cases' ha with X hX
-  --  There's a bound Y such that if n≥Y then b(n) is within ε/2 of u
-  obtain ⟨Y, hY⟩ := hb (ε / 2) (by linarith)
-  --  use max(X,Y),
-  use max X Y
-  -- now say n ≥ max(X,Y)
-  intro n hn
-  rw [max_le_iff] at hn
-  specialize hX n hn.1
-  specialize hY n hn.2
-  --  Then easy.
-  rw [abs_lt] at *
-  constructor <;>-- `<;>` means "do next tactic to all goals produced by this tactic"
-    linarith
+  intro ε hε --introduce ε from the goal
+
+  specialize ha (ε/2) (by linarith) -- restrict delta of the convergence of a(t) to ε / 2
+  specialize hb (ε/2) (by linarith)
+
+  cases' ha with Ba ha
+  cases' hb with Bb hb
+  use max Bb Ba -- take the bigger delta of the two convergences
+
+  intro n hn -- introduce n and n ≤ max Bb Ba
+  specialize ha n -- use the same n for both convergent series a(t) and b(u)
+  specialize hb n
+
+  rewrite [max_le_iff] at hn -- decompose max Ba Bb ≤ n to Bb ≤ n ∧ Ba ≤ n
+  specialize ha hn.right -- fulfill Ba ≤ n and Bb ≤ n for the two convergence definitions
+  specialize hb hn.left
+
+  rw [abs_lt] at * -- finish calc
+  constructor <;> linarith
+
+
+
+
+
 
 /-- If `a(n)` tends to t and `b(n)` tends to `u` then `a(n) - b(n)`
 tends to `t - u`. -/
 theorem tendsTo_sub {a b : ℕ → ℝ} {t u : ℝ} (ha : TendsTo a t) (hb : TendsTo b u) :
     TendsTo (fun n ↦ a n - b n) (t - u) := by
-  -- this one follows without too much trouble from earlier results.
-  sorry
+    apply tendsTo_add
+    exact ha
+    apply tendsTo_neg
+    exact hb
+
 
 end Section2sheet5

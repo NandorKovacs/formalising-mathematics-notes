@@ -67,6 +67,7 @@ theorem tendsTo_def {a : ℕ → ℝ} {t : ℝ} :
 -- are all definitionally equal, so `rfl` sees through them.
 /-
 
+
 ## The questions
 
 Here are some basic results about limits of sequences.
